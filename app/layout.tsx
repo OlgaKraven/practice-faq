@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Навигатор по практике · высшее образование',
-  description: 'Обезличенная памятка по учебной и производственной практике: документы, договоры и проверка комплекта.',
+  title: 'Практика без паники',
+  description: 'Понятный чек-лист по учебной и производственной практике: сроки, документы и частые вопросы.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -14,4 +14,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-
