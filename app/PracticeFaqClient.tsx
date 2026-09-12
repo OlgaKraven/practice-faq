@@ -278,7 +278,7 @@ export default function Home() {
 
   useEffect(() => {
     try {
-      const saved = window.localStorage.getItem('practice-faq-checklist');
+      const saved = window.localStorage.getItem('practice-faq-checklist-v2');
       const savedKind = window.localStorage.getItem('practice-faq-kind') as PracticeKind | null;
       const savedPlacement = window.localStorage.getItem('practice-faq-placement') as Placement | null;
       if (saved) setCompleted(JSON.parse(saved));
@@ -293,7 +293,7 @@ export default function Home() {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      window.localStorage.setItem('practice-faq-checklist', JSON.stringify(completed));
+      window.localStorage.setItem('practice-faq-checklist-v2', JSON.stringify(completed));
       if (practiceKind) window.localStorage.setItem('practice-faq-kind', practiceKind);
       if (placement) window.localStorage.setItem('practice-faq-placement', placement);
     } catch {
@@ -301,9 +301,9 @@ export default function Home() {
     }
   }, [completed, hydrated, placement, practiceKind]);
 
-  const visibleDocuments = practiceKind === 'study' ? documents.filter((document) => document.id !== 'certificate') : documents;
+  const visibleDocuments = !practiceKind ? [] : practiceKind === 'study' ? documents.filter((document) => document.id !== 'certificate') : documents;
   const completedCount = visibleDocuments.filter((document) => completed[document.id]).length;
-  const progress = Math.round((completedCount / visibleDocuments.length) * 100);
+  const progress = visibleDocuments.length ? Math.round((completedCount / visibleDocuments.length) * 100) : 0;
 
   const displayFaq = useMemo(() => {
     if (practiceKind !== 'study') return faq;
@@ -389,11 +389,11 @@ export default function Home() {
           <p className="mt-3 leading-relaxed text-black/60">Справка нужна только для производственной практики. Для учебной — убираем её из списка.</p>
 
           <div className="mt-7 grid gap-3">
-            <Button aria-pressed={practiceKind === 'production'} variant={practiceKind === 'production' ? 'default' : 'outline'} className="h-auto justify-start gap-4 rounded-2xl px-4 py-4 text-left" onClick={() => setPracticeKind('production')}>
+            <Button aria-pressed={practiceKind === 'production'} variant={practiceKind === 'production' ? 'default' : 'outline'} className="h-auto justify-start gap-4 rounded-2xl px-4 py-4 text-left" onClick={() => { setPracticeKind('production'); setCompleted({}); }}>
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-black/6"><Building2 className="size-5" /></span>
               <span><strong className="block text-base">Производственная</strong><span className="mt-0.5 block text-sm font-normal opacity-70">Справка + договор по ситуации</span></span>
             </Button>
-            <Button aria-pressed={practiceKind === 'study'} variant={practiceKind === 'study' ? 'default' : 'outline'} className="h-auto justify-start gap-4 rounded-2xl px-4 py-4 text-left" onClick={() => { setPracticeKind('study'); setPlacement(null); }}>
+            <Button aria-pressed={practiceKind === 'study'} variant={practiceKind === 'study' ? 'default' : 'outline'} className="h-auto justify-start gap-4 rounded-2xl px-4 py-4 text-left" onClick={() => { setPracticeKind('study'); setPlacement(null); setCompleted({}); }}>
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-black/6"><GraduationCap className="size-5" /></span>
               <span><strong className="block text-base">Учебная</strong><span className="mt-0.5 block text-sm font-normal opacity-70">Справка не нужна</span></span>
             </Button>
@@ -447,7 +447,7 @@ export default function Home() {
           <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr]">
             <div className="lg:sticky lg:top-24 lg:self-start">
               <Badge className="bg-primary text-white">Главная миссия</Badge>
-              <h2 className="mt-5 text-4xl font-extrabold leading-[0.95] tracking-[-0.05em] sm:text-6xl">{practiceKind === 'study' ? 'Четыре файла в LMS' : 'Пять файлов в LMS'}</h2>
+              <h2 className="mt-5 text-4xl font-extrabold leading-[0.95] tracking-[-0.05em] sm:text-6xl">{practiceKind ? practiceKind === 'study' ? 'Четыре файла в LMS' : 'Пять файлов в LMS' : 'Сначала выберите вид практики'}</h2>
               <p className="mt-5 max-w-md text-lg leading-relaxed text-white/70">Отмечайте готовое. Прогресс хранится только на вашем устройстве — можно закрыть страницу и вернуться.</p>
 
               <Progress value={progress} className="mt-8 gap-2 text-white">
@@ -458,7 +458,7 @@ export default function Home() {
                 <p className="text-sm text-white/60">{progress}% готово</p>
                 {completedCount > 0 && <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 hover:text-white" onClick={() => setCompleted({})}><RefreshCcw /> Сбросить</Button>}
               </div>
-              {completedCount === visibleDocuments.length && (
+              {visibleDocuments.length > 0 && completedCount === visibleDocuments.length && (
                 <output className="mt-6 rounded-2xl bg-[#d1e000] p-5 text-black">
                   <PartyPopper className="mb-3 size-7" />
                   <p className="text-xl font-extrabold">Комбо собрано!</p>
@@ -468,7 +468,7 @@ export default function Home() {
             </div>
 
             <div className="grid gap-3">
-              {visibleDocuments.map((document) => {
+              {visibleDocuments.length ? visibleDocuments.map((document) => {
                 const isDone = Boolean(completed[document.id]);
                 return (
                   <label key={document.id} className={`group grid cursor-pointer gap-4 rounded-[24px] border p-5 transition-colors sm:grid-cols-[auto_1fr_auto] sm:items-center ${isDone ? 'border-white/35 bg-white text-black' : 'border-white/15 bg-[#191919] hover:border-white/35'}`}>
@@ -484,9 +484,9 @@ export default function Home() {
                     </span>
                   </label>
                 );
-              })}
+              }) : <div className="rounded-[24px] border border-dashed border-white/20 bg-[#191919] p-8 text-white/65"><CircleHelp className="size-8 text-primary" /><p className="mt-4 text-lg font-extrabold text-white">Документы появятся после выбора практики</p><p className="mt-2 text-sm leading-relaxed">Выберите учебную или производственную практику выше — покажем только ваш комплект.</p></div>}
 
-              <div className="mt-3 rounded-[24px] border border-primary/50 bg-primary/12 p-5">
+              {practiceKind && <div className="mt-3 rounded-[24px] border border-primary/50 bg-primary/12 p-5">
                 <div className="flex gap-4">
                   <AlertTriangle className="mt-0.5 size-6 shrink-0 text-primary" />
                   <div>
@@ -494,7 +494,7 @@ export default function Home() {
                     <p className="mt-2 text-sm leading-relaxed text-white/65">{practiceKind === 'study' ? 'Справка и договор не нужны, если в вашем задании нет отдельного требования.' : 'Договор нужен только при самостоятельном поиске места и сдаётся бумажным оригиналом тьютору в деканат. Если LMS отдельно требует скан, следуйте указанию в LMS.'}</p>
                   </div>
                 </div>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
