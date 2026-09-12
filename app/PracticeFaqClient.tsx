@@ -458,11 +458,11 @@ export default function Home() {
                 {completedCount > 0 && <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 hover:text-white" onClick={() => setCompleted({})}><RefreshCcw /> Сбросить</Button>}
               </div>
               {visibleDocuments.length > 0 && completedCount === visibleDocuments.length && (
-                <output className="mt-6 rounded-2xl bg-[#d1e000] p-5 text-black">
+                <div role="status" className="mt-6 block rounded-2xl bg-[#d1e000] p-5 text-black">
                   <PartyPopper className="mb-3 size-7" />
                   <p className="text-xl font-extrabold">Комбо собрано!</p>
                   <p className="mt-1 text-sm font-semibold">Теперь пройдите финальную проверку ниже.</p>
-                </output>
+                </div>
               )}
             </div>
 
