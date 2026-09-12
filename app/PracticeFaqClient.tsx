@@ -28,7 +28,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Progress, ProgressLabel, ProgressValue } from '@/components/ui/progress';
 
 type Placement = 'university' | 'self';
 type PracticeKind = 'production' | 'study';
@@ -450,10 +449,10 @@ export default function Home() {
               <h2 className="mt-5 text-4xl font-extrabold leading-[0.95] tracking-[-0.05em] sm:text-6xl">{practiceKind ? practiceKind === 'study' ? 'Четыре файла в LMS' : 'Пять файлов в LMS' : 'Сначала выберите вид практики'}</h2>
               <p className="mt-5 max-w-md text-lg leading-relaxed text-white/70">Отмечайте готовое. Прогресс хранится только на вашем устройстве — можно закрыть страницу и вернуться.</p>
 
-              <Progress value={progress} className="mt-8 gap-2 text-white">
-                <ProgressLabel className="text-white">Готовность комплекта</ProgressLabel>
-                <ProgressValue className="text-white/70">{() => `${completedCount} из ${visibleDocuments.length}`}</ProgressValue>
-              </Progress>
+              <div className="mt-8" aria-label={`Готовность комплекта: ${progress}%`}>
+                <div className="flex items-center justify-between gap-4 text-sm"><span className="font-semibold">Готовность комплекта</span><span className="text-white/70">{completedCount} из {visibleDocuments.length}</span></div>
+                <progress className="mt-3 h-3 w-full accent-[#d1e000]" value={progress} max={100} aria-label="Готовность комплекта" />
+              </div>
               <div className="mt-4 flex items-center justify-between gap-4">
                 <p className="text-sm text-white/60">{progress}% готово</p>
                 {completedCount > 0 && <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 hover:text-white" onClick={() => setCompleted({})}><RefreshCcw /> Сбросить</Button>}
